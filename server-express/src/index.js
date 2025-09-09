@@ -18,16 +18,22 @@ app.use(cors({
       'https://beta-test-frontend.vercel.app'
     ];
     
-    // Allow Vercel preview deployments
-    if (!origin || allowedOrigins.includes(origin) || origin.includes('vercel.app')) {
-      callback(null, true);
+    // In production, be more strict with CORS
+    if (process.env.NODE_ENV === 'production') {
+      if (!origin || allowedOrigins.includes(origin) || origin.includes('vercel.app')) {
+        callback(null, true);
+      } else {
+        console.warn('CORS blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
+      }
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // In development, allow all origins
+      callback(null, true);
     }
   },
-  credentials: true ,
+  credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"] 
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }))
 
 app.options("*", cors());
@@ -51,8 +57,11 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    domain: process.env.NODE_ENV === 'production' ? undefined : undefined // Let browser handle domain
+  },
+  name: 'nexeed.session.id' // Custom session name
 }))
 
 const PORT = process.env.PORT || 8080
