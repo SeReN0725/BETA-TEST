@@ -136,44 +136,77 @@ const QUESTIONS = [
 // 스타일 상수 정의
 const styles = {
   container: {
-    maxWidth: 880,
-    margin: "40px auto",
-    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-    padding: "0 20px",
+    maxWidth: 1000,
+    margin: "0 auto",
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif",
+    padding: "20px",
+    minHeight: "100vh",
+    backgroundColor: "#f8fafc",
+    lineHeight: 1.6,
   },
   header: {
     textAlign: "center" as const,
-    color: "#333",
-    marginBottom: 30,
+    color: "#0f172a",
+    marginBottom: 48,
+    fontSize: "2.75rem",
+    fontWeight: 800,
+    letterSpacing: "-0.025em",
+    background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
+    lineHeight: 1.2,
   },
   formGrid: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 20,
-    marginBottom: 30,
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gap: 24,
+    marginBottom: 40,
+    padding: "32px",
+    backgroundColor: "white",
+    borderRadius: 20,
+    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+    border: "1px solid #e2e8f0",
   },
   formGroup: {
     display: "flex",
     flexDirection: "column" as const,
-    gap: 8,
+    gap: 12,
   },
   label: {
-    fontWeight: 500,
-    fontSize: 14,
-    color: "#555",
+    fontWeight: 600,
+    fontSize: 15,
+    color: "#1e293b",
+    letterSpacing: "0.025em",
+    marginBottom: 8,
   },
   input: {
-    padding: "10px 12px",
-    border: "1px solid #ddd",
-    borderRadius: 4,
+    padding: "14px 16px",
+    border: "2px solid #e2e8f0",
+    borderRadius: 12,
     fontSize: 16,
+    backgroundColor: "#f8fafc",
+    transition: "all 0.2s ease-in-out",
+    outline: "none",
+    color: "#1e293b",
+    fontWeight: 500,
+  },
+  inputFocus: {
+    borderColor: "#3b82f6",
+    backgroundColor: "white",
+    boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
   },
   select: {
-    padding: "10px 12px",
-    border: "1px solid #ddd",
-    borderRadius: 4,
+    padding: "14px 16px",
+    border: "2px solid #e2e8f0",
+    borderRadius: 12,
     fontSize: 16,
-    backgroundColor: "white",
+    backgroundColor: "#f8fafc",
+    transition: "all 0.2s ease-in-out",
+    outline: "none",
+    cursor: "pointer",
+    color: "#1e293b",
+    fontWeight: 500,
   },
   divider: {
     margin: "30px 0",
@@ -193,81 +226,122 @@ const styles = {
     borderRadius: 4,
   },
   instructionsSection: {
-    backgroundColor: "#f8f9fa",
-    border: "1px solid #e9ecef",
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 30,
+    backgroundColor: "white",
+    border: "1px solid #e2e8f0",
+    borderRadius: 20,
+    padding: 32,
+    marginBottom: 40,
+    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
   },
   instructionsTitle: {
-    color: "#495057",
-    marginBottom: 15,
-    fontSize: 18,
-    fontWeight: 600,
+    color: "#0f172a",
+    marginBottom: 20,
+    fontSize: 24,
+    fontWeight: 700,
+    letterSpacing: "-0.025em",
   },
   instructionsContent: {
-    lineHeight: 1.6,
+    lineHeight: 1.7,
+    color: "#475569",
+    fontSize: 16,
+    fontWeight: 500,
   },
   questionTitle: {
-    marginBottom: 20,
-    color: "#333",
+    marginBottom: 32,
+    color: "#0f172a",
+    fontSize: 26,
+    fontWeight: 800,
+    textAlign: "center" as const,
+    letterSpacing: "-0.025em",
   },
 
   questionItem: {
     display: "flex",
     alignItems: "flex-start",
-    gap: 20,
-    margin: "16px 0",
-    padding: "15px",
-    backgroundColor: "#f9f9f9",
-    borderRadius: 4,
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-    transition: "transform 0.2s, box-shadow 0.2s",
+    gap: 24,
+    margin: "24px 0",
+    padding: "24px",
+    backgroundColor: "white",
+    borderRadius: 20,
+    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+    transition: "all 0.3s ease-in-out",
+    border: "1px solid #e2e8f0",
+  },
+  questionItemHover: {
+    transform: "translateY(-2px)",
+    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    borderColor: "#cbd5e1",
   },
   questionNumber: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontWeight: 600,
+    fontWeight: 700,
     color: "white",
-    backgroundColor: "#4a6cf7",
+    background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
     borderRadius: "50%",
+    fontSize: 16,
+    flexShrink: 0,
   },
   questionText: {
-    marginBottom: 12,
-    fontSize: 16,
-    lineHeight: 1.5,
+    marginBottom: 16,
+    fontSize: 17,
+    lineHeight: 1.6,
+    color: "#0f172a",
+    fontWeight: 600,
   },
   optionsGroup: {
     display: "flex",
-    flexWrap: "wrap" as const,
-    gap: 15,
+    flexDirection: "column" as const,
+    gap: 12,
   },
   optionLabel: {
     display: "flex",
     alignItems: "center",
-    gap: 5,
+    gap: 12,
     cursor: "pointer",
-    padding: "6px 10px",
-    borderRadius: 4,
-    transition: "background-color 0.2s",
+    padding: "12px 16px",
+    borderRadius: 12,
+    transition: "all 0.2s ease-in-out",
+    border: "1px solid #e2e8f0",
+    backgroundColor: "#f8fafc",
+    fontSize: 15,
+    lineHeight: 1.5,
+    color: "#1e293b",
+    fontWeight: 500,
+  },
+  optionLabelHover: {
+    backgroundColor: "#f1f5f9",
+    borderColor: "#cbd5e1",
   },
   optionLabelSelected: {
-    backgroundColor: "rgba(74, 108, 247, 0.1)",
+    backgroundColor: "rgba(59, 130, 246, 0.1)",
+    borderColor: "#3b82f6",
+    color: "#0f172a",
+    fontWeight: 600,
   },
   submitButton: {
-    marginTop: 30,
-    padding: "12px 24px",
-    backgroundColor: "#4a6cf7",
+    marginTop: 40,
+    padding: "16px 32px",
+    background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
     color: "white",
     border: "none",
-    borderRadius: 4,
-    fontSize: 16,
-    fontWeight: 600,
+    borderRadius: 12,
+    fontSize: 18,
+    fontWeight: 700,
     cursor: "pointer",
-    transition: "background-color 0.2s",
+    transition: "all 0.3s ease-in-out",
+    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+    width: "100%",
+    maxWidth: 300,
+    margin: "40px auto 0",
+    display: "block",
+  },
+  submitButtonHover: {
+    transform: "translateY(-2px)",
+    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
   },
   requiredField: {
     color: "#e53e3e",
@@ -367,23 +441,26 @@ const styles = {
     marginTop: 4,
   },
   progressContainer: {
-    marginTop: 20,
-    marginBottom: 30,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    height: 8,
+    marginTop: 24,
+    marginBottom: 40,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 12,
+    height: 12,
     overflow: "hidden",
+    boxShadow: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
   },
   progressBar: {
     height: "100%",
-    backgroundColor: "#4a6cf7",
-    transition: "width 0.3s ease",
+    background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+    transition: "width 0.5s ease-in-out",
+    borderRadius: 12,
   },
   progressText: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 8,
+    fontSize: 16,
+    color: "#475569",
+    marginTop: 12,
     textAlign: "center" as const,
+    fontWeight: 600,
   },
 }
 
@@ -522,17 +599,18 @@ export default function Home(){
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       
-      <main style={styles.container}>
+      <main style={styles.container} role="main">
         <h1 style={styles.header}>NeXeed Big Five 설문 제출</h1>
         
-        <div style={styles.progressContainer}>
+        <div style={styles.progressContainer} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="설문 진행률">
           <div style={{...styles.progressBar, width: `${progress}%`}}></div>
         </div>
-        <div style={styles.progressText}>
+        <div style={styles.progressText} aria-live="polite" id="progress-text">
           {progress}% 완료 ({Object.keys(answers).length}/30 문항 응답)
         </div>
         
-        <div style={styles.formGrid}>
+        <fieldset style={{...styles.formGrid, border: "none", margin: 0, padding: "32px"}}>
+          <legend style={{fontSize: "20px", fontWeight: 700, color: "#1f2937", marginBottom: "24px", padding: 0}}>개인정보 입력</legend>
           <div style={styles.formGroup}>
             <label style={styles.label}>
               학번 (자동 생성된 UUID) <span style={styles.requiredField}>*</span>
@@ -562,10 +640,16 @@ export default function Home(){
               이름 <span style={styles.requiredField}>*</span>
             </label>
             <input 
-              style={{...styles.input, ...(errors.name ? {border: "1px solid #e53e3e"} : {})}}
+              style={{...styles.input, ...(errors.name ? {border: "2px solid #ef4444"} : {})}}
               placeholder="예: 홍길동" 
               value={form.name} 
-              onChange={e=>update("name", e.target.value)} 
+              onChange={e=>update("name", e.target.value)}
+              onFocus={e => Object.assign(e.target.style, styles.inputFocus)}
+              onBlur={e => {
+                e.target.style.borderColor = errors.name ? "#ef4444" : "#e5e7eb";
+                e.target.style.backgroundColor = "#f9fafb";
+                e.target.style.boxShadow = "none";
+              }}
             />
             {errors.name && <div style={styles.errorText}>{errors.name}</div>}
           </div>
@@ -575,10 +659,16 @@ export default function Home(){
               이메일 <span style={styles.requiredField}>*</span>
             </label>
             <input 
-              style={{...styles.input, ...(errors.email ? {border: "1px solid #e53e3e"} : {})}}
+              style={{...styles.input, ...(errors.email ? {border: "2px solid #ef4444"} : {})}}
               placeholder="예: example@email.com" 
               value={form.email} 
-              onChange={e=>update("email", e.target.value)} 
+              onChange={e=>update("email", e.target.value)}
+              onFocus={e => Object.assign(e.target.style, styles.inputFocus)}
+              onBlur={e => {
+                e.target.style.borderColor = errors.email ? "#ef4444" : "#e5e7eb";
+                e.target.style.backgroundColor = "#f9fafb";
+                e.target.style.boxShadow = "none";
+              }}
             />
             {errors.email && <div style={styles.errorText}>{errors.email}</div>}
           </div>
@@ -637,7 +727,7 @@ export default function Home(){
               onChange={e=>update("availability", e.target.value)} 
             />
           </div>
-        </div>
+        </fieldset>
 
         <hr style={styles.divider} />
 
@@ -662,18 +752,29 @@ export default function Home(){
           </div>
         </div>
         
-        <h2 style={styles.questionTitle}>성격 설문 문항 (1~5점)</h2>
+        <h2 style={styles.questionTitle} id="questions-title">성격 설문 문항 (1~5점)</h2>
         <p>각 문항에 대해 1(전혀 그렇지 않다)부터 5(매우 그렇다)까지 평가해주세요.</p>
         
         {Q.map(i => {
           return (
-            <div key={i} style={{...styles.questionItem, borderLeft: `4px solid #4a6cf7`}}>
+            <div 
+              key={i} 
+              role="group"
+              aria-labelledby={`question-${i}-text`}
+              style={{...styles.questionItem, borderLeft: `4px solid #667eea`}}
+              onMouseEnter={e => Object.assign(e.currentTarget.style, styles.questionItemHover)}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+                e.currentTarget.style.borderColor = "#f3f4f6";
+              }}
+            >
               <div style={styles.questionNumber}>Q{i}</div>
               <div style={{flex: 1}}>
-                <div style={styles.questionText}>
+                <div style={styles.questionText} id={`question-${i}-text`}>
                   {QUESTIONS[i-1].question}
                 </div>
-                <div style={styles.optionsGroup}>
+                <div style={styles.optionsGroup} role="radiogroup" aria-labelledby={`question-${i}-text`}>
                   {QUESTIONS[i-1].options.map((option,idx)=>{
                     // 빈 선택지는 렌더링하지 않음
                     if (!option || option.trim() === '') return null;
@@ -683,12 +784,27 @@ export default function Home(){
                     const v = isForceChoice ? (idx === 0 ? 1 : 5) : idx+1;
                     const checked = answers[`Q${i}`]===v
                     return (
-                      <label key={v} style={{...styles.optionLabel, ...(checked ? styles.optionLabelSelected : {})}}>
+                      <label 
+                        key={v} 
+                        style={{...styles.optionLabel, ...(checked ? styles.optionLabelSelected : {})}}
+                        onMouseEnter={e => {
+                          if (!checked) {
+                            Object.assign(e.currentTarget.style, styles.optionLabelHover);
+                          }
+                        }}
+                        onMouseLeave={e => {
+                          if (!checked) {
+                            e.currentTarget.style.backgroundColor = "#f9fafb";
+                            e.currentTarget.style.borderColor = "#f3f4f6";
+                          }
+                        }}
+                      >
                         <input 
                           type="radio" 
                           name={`Q${i}`} 
                           checked={checked} 
                           onChange={()=>setAns(i,v)} 
+                          aria-describedby={`question-${i}-text`}
                         /> 
                         {option}
                       </label>
@@ -704,6 +820,30 @@ export default function Home(){
           onClick={submit} 
           style={{...styles.submitButton, ...(isSubmitting ? {opacity: 0.7, cursor: "not-allowed"} : {})}}
           disabled={isSubmitting}
+          onMouseEnter={e => {
+            if (!isSubmitting) {
+              Object.assign(e.currentTarget.style, styles.submitButtonHover);
+            }
+          }}
+          onMouseLeave={e => {
+            if (!isSubmitting) {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+            }
+          }}
+          onFocus={e => {
+            if (!isSubmitting) {
+              Object.assign(e.currentTarget.style, styles.submitButtonHover);
+            }
+          }}
+          onBlur={e => {
+            if (!isSubmitting) {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+            }
+          }}
+          aria-describedby="progress-text"
+          aria-label="설문 제출하기"
         >
           {isSubmitting ? "제출 중..." : "설문 제출하기"}
         </button>
