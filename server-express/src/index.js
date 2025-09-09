@@ -11,11 +11,20 @@ const { Pool } = pkg
 
 const app = express()
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-    'https://beta-test-frontend-beryl.vercel.app',
-    'https://beta-test-frontend.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'https://beta-test-frontend-beryl.vercel.app',
+      'https://beta-test-frontend.vercel.app'
+    ];
+    
+    // Allow Vercel preview deployments
+    if (!origin || allowedOrigins.includes(origin) || origin.includes('vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true ,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"] 
