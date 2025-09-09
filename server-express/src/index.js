@@ -26,8 +26,9 @@ app.use(express.json({limit:'1mb'}))
 if (!process.env.SESSION_SECRET) {
   throw new Error('SESSION_SECRET environment variable is required');
 }
+// JWT_SECRET은 현재 사용하지 않으므로 경고만 출력
 if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
+  console.warn('JWT_SECRET environment variable not set - some features may not work');
 }
 
 app.use(session({
@@ -46,9 +47,19 @@ const AI_BASE = process.env.AI_BASE || 'http://localhost:8001'
 const pool = new Pool({ connectionString: process.env.POSTGRES_URL })
 
 async function init() {
-  const schema = await (await import('fs/promises')).readFile(new URL('../schema.sql', import.meta.url))
-  await pool.query(schema.toString())
-  console.log('DB schema ensured')
+  // 조건부 스키마 적용 - Railway 환경에서 파일 경로 문제 방지
+  if (process.env.APPLY_SCHEMA === 'true') {
+    try {
+      const schema = await (await import('fs/promises')).readFile(new URL('../schema.sql', import.meta.url))
+      await pool.query(schema.toString())
+      console.log('DB schema applied')
+    } catch (error) {
+      console.warn('Schema file not found or failed to apply:', error.message)
+      console.log('Skipping schema application - database should already be initialized')
+    }
+  } else {
+    console.log('Schema application skipped (APPLY_SCHEMA != true)')
+  }
 }
 init().catch(console.error)
 
@@ -154,14 +165,16 @@ app.get('/admin/login', (req, res) => {
     return res.redirect('/admin')
   }
   
-  // Redirect to Next.js admin login page
-  res.redirect('http://localhost:3000/admin/login')
+  // Railway 환경에서도 작동하도록 환경변수 사용
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
+  res.redirect(`${frontendUrl}/admin/login`)
 })
 
 // Admin dashboard with authentication
 app.get('/admin', requireAuth, (req, res) => {
-  // Redirect to Next.js admin dashboard
-  res.redirect('http://localhost:3000/admin')
+  // Railway 환경에서도 작동하도록 환경변수 사용
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
+  res.redirect(`${frontendUrl}/admin`)
 })
 
 // Submit survey + student info
