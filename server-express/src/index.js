@@ -58,10 +58,11 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    domain: process.env.NODE_ENV === 'production' ? undefined : undefined // Let browser handle domain
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    // Remove domain setting to allow cross-domain cookies
   },
-  name: 'nexeed.session.id' // Custom session name
+  name: 'nexeed.session.id', // Custom session name
+  proxy: process.env.NODE_ENV === 'production' // Trust proxy in production
 }))
 
 const PORT = process.env.PORT || 8080
@@ -87,17 +88,24 @@ init().catch(console.error)
 
 // Authentication middleware
 const requireAuth = async (req, res, next) => {
+  console.log('Auth check - Session ID:', req.sessionID)
+  console.log('Auth check - Admin ID:', req.session?.adminId)
+  console.log('Auth check - Session:', req.session)
+  
   if (!req.session.adminId) {
+    console.log('No adminId in session - authentication required')
     return res.status(401).json({ error: 'Authentication required' })
   }
   
   try {
     const result = await pool.query('SELECT id, username FROM admin_users WHERE id = $1', [req.session.adminId])
     if (result.rows.length === 0) {
+      console.log('Admin user not found in database')
       req.session.destroy()
       return res.status(401).json({ error: 'Invalid session' })
     }
     req.admin = result.rows[0]
+    console.log('Auth successful for user:', req.admin.username)
     next()
   } catch (error) {
     console.error('Auth middleware error:', error)
@@ -134,9 +142,22 @@ app.post('/auth/login', async (req, res) => {
     req.session.adminId = admin.id
     req.session.username = admin.username
     
-    res.json({ 
-      success: true, 
-      admin: { id: admin.id, username: admin.username }
+    console.log('Login successful - Setting session for user:', admin.username)
+    console.log('Session ID:', req.sessionID)
+    console.log('Session data:', req.session)
+    
+    // Explicitly save session to ensure it's persisted
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err)
+        return res.status(500).json({ error: 'Session save failed' })
+      }
+      
+      console.log('Session saved successfully')
+      res.json({ 
+        success: true, 
+        admin: { id: admin.id, username: admin.username }
+      })
     })
   } catch (error) {
     console.error('Login error:', error)
