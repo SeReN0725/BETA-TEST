@@ -2,6 +2,7 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
 import fetch from 'node-fetch'
 import pkg from 'pg'
 import bcrypt from 'bcryptjs'
@@ -10,25 +11,43 @@ import { v4 as uuidv4 } from 'uuid'
 const { Pool } = pkg
 
 const app = express()
+
+// Security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://beta-test-production.up.railway.app", "http://beta-test.railway.internal"]
+    }
+  },
+  crossOriginEmbedderPolicy: false
+}))
+
 app.use(cors({
   origin: function (origin, callback) {
     const allowedOrigins = [
       process.env.FRONTEND_URL || 'http://localhost:3000',
-      'https://beta-test-frontend-beryl.vercel.app',
       'https://beta-test-frontend.vercel.app'
     ];
     
     // In production, be more strict with CORS
     if (process.env.NODE_ENV === 'production') {
-      if (!origin || allowedOrigins.includes(origin) || origin.includes('vercel.app')) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.warn('CORS blocked origin:', origin);
         callback(new Error('Not allowed by CORS'));
       }
     } else {
-      // In development, allow all origins
-      callback(null, true);
+      // In development, allow localhost only
+      if (!origin || origin.startsWith('http://localhost')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
     }
   },
   credentials: true,

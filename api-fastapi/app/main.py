@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header, Depends
 from pydantic import BaseModel, Field
 from typing import Dict, List, Optional
 from math import isfinite
@@ -12,6 +12,14 @@ from app.data_processor import extract_student_features, prepare_training_data, 
 from app.deep_matching import DeepMatchingModel, train_model, load_model, greedy_match_with_model
 
 app = FastAPI(title="NeXeed AI Service", version="0.2.0")
+
+# API Key Authentication
+API_KEY = os.getenv("API_KEY", "nexeed-ai-key-2024")
+
+def verify_api_key(x_api_key: str = Header(None)):
+    if x_api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API Key")
+    return x_api_key
 
 # 딥러닝 모델 초기화
 MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
@@ -233,7 +241,7 @@ def balance_team_scores(teams: List[List[Student]], req_roles: Dict[str,int]) ->
     return teams
 
 @app.post("/match/run", response_model=MatchResponse)
-def match_run(req: MatchRequest):
+def match_run(req: MatchRequest, api_key: str = Depends(verify_api_key)):
     if req.team_size < 2:
         raise HTTPException(400, "team_size must be >=2")
     studs = req.students
@@ -253,7 +261,7 @@ def match_run(req: MatchRequest):
 
 
 @app.post("/match/run_deep", response_model=MatchResponse)
-def match_run_deep(req: MatchRequest):
+def match_run_deep(req: MatchRequest, api_key: str = Depends(verify_api_key)):
     """딥러닝 모델을 사용한 팀 매칭 실행"""
     if req.team_size < 2:
         raise HTTPException(400, "team_size must be >=2")
@@ -306,7 +314,7 @@ class TrainResponse(BaseModel):
 
 
 @app.post("/match/train", response_model=TrainResponse)
-def train_deep_model(req: TrainRequest):
+def train_deep_model(req: TrainRequest, api_key: str = Depends(verify_api_key)):
     """딥러닝 모델 학습 엔드포인트"""
     global DEEP_MODEL
     
