@@ -1,0 +1,55 @@
+
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nexeed}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-nexeed}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./api-fastapi
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+    volumes:
+      - ./api-fastapi:/app
+    depends_on:
+      - db
+
+  server:
+    build:
+      context: ./server-express
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./server-express/.env
+    volumes:
+      - ./server-express:/app
+    depends_on:
+      - db
+      - api
+
+  web:
+    build:
+      context: ./web-nextjs
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+            - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    volumes:
+      - ./web-nextjs:/app
+    depends_on:
+      - server
+volumes:
+  db_data:
