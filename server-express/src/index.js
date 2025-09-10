@@ -535,6 +535,7 @@ app.get('/api/admin/cohorts/:cohortId/export', requireAuth, async (req, res) => 
     const result = await pool.query(`
       SELECT s.name, s.email, s.id as student_id, s.major, s.role_pref, s.skills, s.mbti,
              b.O, b.C, b.E, b.A, b.N, b.scored_at,
+             COALESCE(t.id::text, 'No Team') as team_id,
              COALESCE(tm.role_assigned, 'Unassigned') as team_role
       FROM cohort_enrollments ce
       JOIN students s ON s.id = ce.student_id
@@ -542,11 +543,11 @@ app.get('/api/admin/cohorts/:cohortId/export', requireAuth, async (req, res) => 
       LEFT JOIN team_members tm ON tm.student_id = s.id
       LEFT JOIN teams t ON t.id = tm.team_id AND t.cohort_id = ce.cohort_id
       WHERE ce.cohort_id = $1
-      ORDER BY s.name
+      ORDER BY COALESCE(t.id, 999999), s.name
     `, [cohortId]);
     
     // CSV 형식으로 변환
-    const headers = ['Name', 'Email', 'Student ID', 'Major', 'Role Preference', 'Skills', 'MBTI', 'Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism', 'Scored At', 'Team Role'];
+    const headers = ['Name', 'Email', 'Student ID', 'Major', 'Role Preference', 'Skills', 'MBTI', 'Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism', 'Scored At', 'Team ID', 'Team Role'];
     const csvData = [headers.join(',')];
     
     result.rows.forEach(row => {
@@ -564,6 +565,7 @@ app.get('/api/admin/cohorts/:cohortId/export', requireAuth, async (req, res) => 
         row.a || '',
         row.n || '',
         row.scored_at || '',
+        row.team_id || '',
         row.team_role || ''
       ].map(field => `"${String(field).replace(/"/g, '""')}"`);
       csvData.push(csvRow.join(','));
