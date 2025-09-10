@@ -160,7 +160,7 @@ def role_coverage_bonus(team: List[Student], req: Dict[str,int]) -> float:
     return 0.1 * (ok / max(1, need))
 
 def team_score(team: List[Student], req: Dict[str,int]) -> float:
-    return round(team_internal_score(team) + role_coverage_bonus(team, req), 3)
+    return round(team_internal_score(team) + role_coverage_bonus(team, req), 6)
 
 def greedy_match(students: List[Student], team_size:int, req_roles: Dict[str,int]) -> List[List[Student]]:
     remaining = students[:]
