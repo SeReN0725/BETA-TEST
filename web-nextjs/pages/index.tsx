@@ -465,7 +465,7 @@ const styles = {
 }
 
 export default function Home(){
-  const [cohortId,setCohortId] = useState("1")
+  const [cohortId,setCohortId] = useState("2")
   const [form,setForm] = useState({
     id: uuidv4(), // 자동으로 UUID 생성
     name: "", email:"", major:"", skills:"", mbti:"",
