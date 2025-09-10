@@ -719,13 +719,14 @@ export default function Home(){
           </div>
           
           <div style={styles.formGroup}>
-            <label style={styles.label}>가능한 시간(입력하지마시오)</label>
+            <label style={styles.label}>가능한 시간 (고정값)</label>
             <input 
-              style={styles.input}
+              style={{...styles.input, backgroundColor: "#f5f5f5", cursor: "not-allowed"}}
               placeholder="예: MonEve;WedEve;Weekend" 
               value={form.availability} 
-              onChange={e=>update("availability", e.target.value)} 
+              readOnly
             />
+            <div style={{fontSize: 12, color: "#666", marginTop: 4}}>이 값은 수정할 수 없습니다.</div>
           </div>
         </fieldset>
 
