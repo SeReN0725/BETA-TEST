@@ -5,6 +5,10 @@ from typing import Dict, List, Optional
 from math import isfinite
 import os
 import numpy as np
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # 딥러닝 모델 관련 모듈 임포트
 from app.models import Student, TeamData

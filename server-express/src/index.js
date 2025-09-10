@@ -328,7 +328,14 @@ app.post('/api/cohorts/:cohortId/match', requireAuth, async (req,res) => {
        WHERE e.cohort_id = $1`, [cohortId]
     )
     const payload = { team_size, required_roles: req_roles, students: r.rows }
-    const resp = await fetch(`${AI_BASE}/match/run`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)})
+    const resp = await fetch(`${AI_BASE}/match/run`, { 
+      method:'POST', 
+      headers:{
+        'Content-Type':'application/json',
+        'X-API-Key': process.env.AI_API_KEY || 'nexeed-ai-key-2024'
+      }, 
+      body: JSON.stringify(payload)
+    })
     if(!resp.ok) {
       const errorText = await resp.text()
       throw new Error(`AI match error: ${resp.status} - ${errorText}`)
