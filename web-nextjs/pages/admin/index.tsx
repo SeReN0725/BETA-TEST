@@ -127,6 +127,10 @@ export default function AdminDashboard() {
     }
   }
 
+  const [showTeamsModal, setShowTeamsModal] = useState(false)
+  const [currentTeams, setCurrentTeams] = useState<any[]>([])
+  const [currentCohortId, setCurrentCohortId] = useState('')
+
   const viewTeams = async (cohortId: string) => {
     try {
       console.log('Fetching teams for cohort:', cohortId)
@@ -145,26 +149,9 @@ export default function AdminDashboard() {
           return
         }
         
-        let teamInfo = `코호트 ${cohortId} 매칭 결과:\n\n`
-        teams.forEach((team: any, index: number) => {
-          console.log('Processing team:', team)
-          console.log('Team score type:', typeof team.score, 'value:', team.score)
-          const scoreValue = typeof team.score === 'number' ? team.score : Number(team.score)
-          const scoreDisplay = !isNaN(scoreValue) ? scoreValue.toFixed(2) : 'N/A'
-          teamInfo += `팀 ${index + 1} (점수: ${scoreDisplay}):\n`
-          if (team.members && Array.isArray(team.members)) {
-            team.members.forEach((member: any) => {
-              console.log('Processing member:', member)
-              teamInfo += `  - ${member.name || 'Unknown'} (${member.role_assigned || member.role_pref || 'No role'})\n`
-            })
-          } else {
-            console.error('Team members is not an array:', team.members)
-            teamInfo += '  - 멤버 정보를 불러올 수 없습니다.\n'
-          }
-          teamInfo += '\n'
-        })
-        
-        alert(teamInfo)
+        setCurrentTeams(teams)
+        setCurrentCohortId(cohortId)
+        setShowTeamsModal(true)
       } else {
         console.error('API Error:', data)
         alert('팀 목록 로드 실패: ' + (data.error || '알 수 없는 오류'))
@@ -367,6 +354,52 @@ export default function AdminDashboard() {
             </div>
           ))}
         </div>
+        
+        {/* Teams Modal */}
+        {showTeamsModal && (
+          <div className="modal-overlay" onClick={() => setShowTeamsModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>코호트 {currentCohortId} 매칭 결과</h2>
+                <button 
+                  className="close-btn" 
+                  onClick={() => setShowTeamsModal(false)}
+                  aria-label="모달 닫기"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="modal-body">
+                {currentTeams.map((team: any, index: number) => {
+                  const scoreValue = typeof team.score === 'number' ? team.score : Number(team.score)
+                  const scoreDisplay = !isNaN(scoreValue) ? scoreValue.toFixed(2) : 'N/A'
+                  return (
+                    <div key={index} className="team-card">
+                      <div className="team-header">
+                        <h3>팀 {index + 1}</h3>
+                        <span className="team-score">점수: {scoreDisplay}</span>
+                      </div>
+                      <div className="team-members">
+                        {team.members && Array.isArray(team.members) ? (
+                          team.members.map((member: any, memberIndex: number) => (
+                            <div key={memberIndex} className="member-card">
+                              <div className="member-name">{member.name || 'Unknown'}</div>
+                              <div className="member-role">{member.role_assigned || member.role_pref || 'No role'}</div>
+                              {member.email && <div className="member-email">{member.email}</div>}
+                              {member.skills && <div className="member-skills">스킬: {member.skills}</div>}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="error-message">멤버 정보를 불러올 수 없습니다.</div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
@@ -602,6 +635,160 @@ export default function AdminDashboard() {
           background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
           box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3) !important;
         }
+        
+        /* Modal Styles */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(5px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+          padding: 1rem;
+        }
+        .modal-content {
+          background: white;
+          border-radius: 20px;
+          max-width: 90vw;
+          max-height: 90vh;
+          width: 800px;
+          overflow: hidden;
+          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1.5rem 2rem;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        }
+        .modal-header h2 {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 700;
+        }
+        .close-btn {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 1.5rem;
+          cursor: pointer;
+          padding: 0.5rem;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+        }
+        .close-btn:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: scale(1.1);
+        }
+        .modal-body {
+          padding: 2rem;
+          max-height: 70vh;
+          overflow-y: auto;
+          display: grid;
+          gap: 1.5rem;
+        }
+        .team-card {
+          background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+          border-radius: 15px;
+          padding: 1.5rem;
+          border: 1px solid rgba(102, 126, 234, 0.1);
+          transition: all 0.3s ease;
+        }
+        .team-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .team-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+          border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+        }
+        .team-header h3 {
+          margin: 0;
+          color: #1e293b;
+          font-size: 1.25rem;
+          font-weight: 700;
+        }
+        .team-score {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-weight: 600;
+          font-size: 0.875rem;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        .team-members {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1rem;
+        }
+        .member-card {
+          background: white;
+          border-radius: 12px;
+          padding: 1.25rem;
+          border: 1px solid rgba(102, 126, 234, 0.1);
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .member-card:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          border-color: rgba(102, 126, 234, 0.2);
+        }
+        .member-name {
+          font-weight: 700;
+          color: #1e293b;
+          font-size: 1rem;
+          margin-bottom: 0.5rem;
+        }
+        .member-role {
+          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+          color: #1e40af;
+          padding: 0.25rem 0.75rem;
+          border-radius: 15px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          display: inline-block;
+          margin-bottom: 0.5rem;
+          border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .member-email {
+          color: #64748b;
+          font-size: 0.875rem;
+          margin-bottom: 0.25rem;
+        }
+        .member-skills {
+          color: #059669;
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+        .error-message {
+          color: #ef4444;
+          font-weight: 600;
+          text-align: center;
+          padding: 1rem;
+          background: rgba(239, 68, 68, 0.1);
+          border-radius: 8px;
+          border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
         @media (max-width: 768px) {
           .container {
             padding: 1rem;
@@ -611,6 +798,19 @@ export default function AdminDashboard() {
             gap: 1rem;
             text-align: center;
             padding: 1.5rem;
+          }
+          .modal-content {
+            width: 95vw;
+            max-height: 95vh;
+          }
+          .modal-header {
+            padding: 1rem 1.5rem;
+          }
+          .modal-body {
+            padding: 1.5rem;
+          }
+          .team-members {
+            grid-template-columns: 1fr;
           }
           h1 {
             font-size: 1.875rem;
