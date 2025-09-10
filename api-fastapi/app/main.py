@@ -132,13 +132,13 @@ def jaccard(a:Set[str], b:Set[str]) -> float:
 W = {"C":0.30,"A":0.20,"E":0.15,"O":0.15,"N":0.10,"AVAIL":0.10}
 
 def pair_score(a: Student, b: Student) -> float:
-    # OCEAN 점수를 0-1 범위로 정규화 (10점 척도 기준)
-    sC = 1 - abs(a.C - b.C) / 10.0
-    sA = 1 - abs(a.A - b.A) / 10.0
-    sE = 1 - abs(a.E - b.E) / 10.0
-    sO = 1 - abs(a.O - b.O) / 10.0
-    # 신경성은 낮을수록 좋으므로 평균을 10으로 나누어 정규화
-    sN = 1 - ((a.N + b.N)/2.0) / 10.0
+    # OCEAN 점수를 0-1 범위로 정규화 (1점 척도 기준)
+    sC = 1 - abs(a.C - b.C)
+    sA = 1 - abs(a.A - b.A)
+    sE = 1 - abs(a.E - b.E)
+    sO = 1 - abs(a.O - b.O)
+    # 신경성은 낮을수록 좋으므로 평균을 1로 나누어 정규화
+    sN = 1 - ((a.N + b.N)/2.0)
     sav = jaccard(parse_slots(a.availability), parse_slots(b.availability))
     base = (W["C"]*sC + W["A"]*sA + W["E"]*sE + W["O"]*sO + W["N"]*sN + W["AVAIL"]*sav)
     return clamp(base)
@@ -160,7 +160,7 @@ def role_coverage_bonus(team: List[Student], req: Dict[str,int]) -> float:
     return 0.1 * (ok / max(1, need))
 
 def team_score(team: List[Student], req: Dict[str,int]) -> float:
-    return round(team_internal_score(team) + role_coverage_bonus(team, req), 6)
+    return round(team_internal_score(team) + role_coverage_bonus(team, req), 3)
 
 def greedy_match(students: List[Student], team_size:int, req_roles: Dict[str,int]) -> List[List[Student]]:
     remaining = students[:]
@@ -249,6 +249,10 @@ def match_run(req: MatchRequest, api_key: str = Depends(verify_api_key)):
         raise HTTPException(400, "team_size must be >=2")
     studs = req.students
     teams = greedy_match(studs, req.team_size, req.required_roles)
+    
+    # 팀 점수 균형화 적용
+    teams = balance_team_scores(teams, req.required_roles)
+    
     out = []
     for t in teams:
         sc = team_score(t, req.required_roles)
