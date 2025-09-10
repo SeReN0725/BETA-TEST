@@ -181,8 +181,7 @@ def greedy_match(students: List[Student], team_size:int, req_roles: Dict[str,int
             curr.append(remaining.pop(best_i))
         teams.append(curr)
     
-    # 두 번째 패스: 팀 간 점수 균형 조정
-    teams = balance_team_scores(teams, req_roles)
+    # 균등화 제거: 자연스러운 점수 분포 허용
     return teams
 
 def balance_team_scores(teams: List[List[Student]], req_roles: Dict[str,int]) -> List[List[Student]]:
